@@ -26,138 +26,97 @@ public:
     }
 };
 
-int Sort1 (int Mass[], int Nreal, int N)
+struct Spisok
 {
-    for (int i=0; i<Nreal; i++)
-    {
-        if (Mass[i]%2==0)
-        {
-            for (int j=Nreal; j>i; j--)
-            {
-                std::swap(Mass[j], Mass[j-1]);
-            }
-            Mass[i]=Mass[i+1];
-            i++; Nreal++;
-        }
-    }
     
-    return Nreal;
-}
-int Sort2 (int Mass[], int Nreal, int N)
+    Spisok* next;
+    int Chis;
+    
+};
+
+
+void ADD (Spisok* head, int Znac)
 {
-    for (int i=0; i<Nreal; i++)
-    {
-        if (Mass[i]%2==0)
-        {
-            int *MassZ = new int[Nreal+1];
-            
-            for (int j=0; j<Nreal+1; j++)
-            {
-                if (j<i) MassZ[j]=Mass[j];
-                if ((j==i)||(j==i+1)) MassZ[j]=Mass[j];
-                if (j>i) MassZ[j]=Mass[j-1];
-            }
-            i++; Nreal++;
-            for (int j=0; j<Nreal; j++)
-            {
-                Mass[j]=MassZ[j];
-            }
-            delete [] MassZ;
-        }
-    }
+    Spisok* p = new Spisok;
+    p->Chis=Znac;
     
-    return Nreal;
-}
-int Sort3 (int Mass[], int Nreal, int N)
-{
-    int *MassZ = new int[N];
-    for (int j=0; j<Nreal; j++)
-    {
-        MassZ[2*j]=Mass[j];
-        MassZ[2*j+1]=Mass[j];
-    }
-    Nreal = N;
+    p->next = head->next;
+    head->next = p;
     
-    for (int i=0; i<Nreal; i++)
-    {
-        
-        if (Mass[i]%2==1)
-        {
-            for (int j=i; j<Nreal*2-1; j++)
-            {
-                Mass[j]=Mass[j+1];
-            }
-            Nreal--;
-        }
-        else
-        {
-            i++;
-        }
-    }
-    
-    for (int j=0; j<Nreal; j++)
-    {
-        Mass[j]=MassZ[j];
-    }
-    
-    delete [] MassZ;
-    return Nreal;
 }
 
+void POISK (Spisok* head, int Znac)
+{
+    Spisok* p = head->next;
+    int count=0;
+    while (p!=nullptr)
+    {
+        if (Znac == p->Chis) count++;
+        p = p->next;
+    }
+    
+    std::cout << count << " ";
+}
+
+void CLEAR (Spisok* head)
+{
+    Spisok* temp = new Spisok;
+    Spisok* p = head->next;
+    
+    while (p!=nullptr)
+    {
+        temp=p;
+        p = p->next;
+        delete temp;
+    }
+}
 
 int main()
 {
-    int N=0; int Nreal=0;
-    std::cin>>N; Nreal=N; N=N*2;
-    int NZ=N; int NrealZ=Nreal;
-    
-    int *Mass = new int[N];
-    int *MassZamen = new int[Nreal];
-    
-    for (int i=0; i<N; i++)
-    {
-        if (i<Nreal) Mass[i]=rand()%10+1;
-        else Mass[i]=0;
-        MassZamen[i]=Mass[i];
-    }
     
     std::cout << "Alg1:" << std::endl;
     
     Timer t1;
     
-    Nreal = Sort1(Mass, Nreal, N);
+    Spisok* head = new Spisok;
+    head->next=nullptr;
+    
+    for (int i=0; i<10000; i++)
+    {
+        ADD(head, 1+rand()%1000);
+    }
+
+    for (int i=0; i<1000; i++)
+    {
+        POISK(head, i);
+    }
     
     std::cout << "Time:"<< t1.elapsed() << std::endl;
-    
-    N=NZ; Nreal=NrealZ;
-    for (int i=0; i<N; i++)
-    {
-        Mass[i]=MassZamen[i];
-    }
     
     std::cout << "Alg2:" << std::endl;
     
     Timer t2;
     
-    Nreal = Sort2(Mass, Nreal, N);
+    int Mass[10000]; int count=0;
+    
+    for (int i=0; i<10000; i++)
+    {
+        Mass[i]=1+rand()%1000;
+    }
+    
+    for (int i=0; i<1000; i++)
+    {
+        count=0;
+        for (int j=0; j<10000; j++)
+        {
+            if (Mass[j]==i) count++;
+        }
+        std::cout << count << " ";
+    }
     
     std::cout << "Time:"<< t2.elapsed() << std::endl;
     
-    N=NZ; Nreal=NrealZ;
-    for (int i=0; i<N; i++)
-    {
-        Mass[i]=MassZamen[i];
-    }
-    
-    std::cout << "Alg3:" << std::endl;
-    
-    Timer t3;
-    
-    Nreal = Sort3(Mass, Nreal, N);
-    
-    std::cout << "Time:"<< t3.elapsed() << std::endl;
-    
-    
-    delete [] Mass; delete [] MassZamen;
+    CLEAR(head);
+    delete head;
     return 0;
 }
